@@ -1,0 +1,42 @@
+#include <Servo.h>      // including the library of servo motor  
+
+Servo myservo;              // create servo object
+
+int initial_position = 90;  // initial position of the servo
+
+int LDR1 = A0;              // connect LDR1 to pin A0
+int LDR2 = A1;              // connect LDR2 to pin A1
+int error = 5;              // set error value for comparison
+
+int servopin = 9;           // define servo pin, ensure it's a PWM pin
+
+void setup()  
+{
+  myservo.attach(servopin);  // attach the servo motor to pin 9
+  pinMode(LDR1, INPUT);      // set LDR1 as input
+  pinMode(LDR2, INPUT);      // set LDR2 as input
+  myservo.write(initial_position);  // set servo to initial position at 90°
+  delay(2000);               // wait for 2 seconds to stabilize
+}
+
+void loop()  
+{
+  int R1 = analogRead(LDR1);  // read the value from LDR1
+  int R2 = analogRead(LDR2);  // read the value from LDR2
+  int diff1 = abs(R1 - R2);  // calculate the difference between the two LDRs
+  int diff2 = abs(R2 - R1);  // calculate the difference in reverse direction
+
+  // If difference between LDR values is greater than error, move the servo
+  if ((diff1 <= error) || (diff2 <= error)) {
+    // no movement required if the light difference is minimal
+  } else {
+    if (R1 > R2) {
+      initial_position = --initial_position;  // rotate servo counter-clockwise
+    }
+    if (R1 < R2) {
+      initial_position = ++initial_position;  // rotate servo clockwise
+    }
+  }
+  myservo.write(initial_position);  // set the new position of the servo
+  delay(100);  // small delay to avoid frequent movements
+}
